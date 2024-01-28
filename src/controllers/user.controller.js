@@ -15,6 +15,7 @@ const registerUser=asyncHandler(async(req,res)=>{
      //return response 
 
      const {fullName,username,email,password}=req.body
+     console.log("email:",email);
     
 
     if(
@@ -23,34 +24,43 @@ const registerUser=asyncHandler(async(req,res)=>{
         throw new ApiError(400,"all fields are required")
     }
 
-    const existedUser=sUser.findOne({
-        $or:[{username},{email}]
+    const existedUser=  await User.findOne({
+        $or:[{ username },
+      { email }]
     })
 
     if(existedUser){
-        throw new ApiError(409,"user already registered")
+        throw new ApiError(409,"user with email or usename already already exist")
     }
+ console.log(req.files)
 
-    const avatarLocalPath=req.files?.avatar[0]?.path;
-
+ //multer give access to files and multer give destination of file
+    const avatarLocalPath = req.files?.avatar[0]?.path;
+   
     const coverImageLocalpath=req.files?.coverImage[0]?.path;
+  
 
     if(!avatarLocalPath){
-        throw new ApiError(400,"avatar file is required")
+        throw new ApiError(400,"avatar file is required in localpath")
     }
+   
 
-    const avatar= await uploadOnCloudinary(avatarLocalPath)
-    const coverImage=uploadOnCloudinary(coverImageLocalpath)
+    const avatar= await uploadOnCloudinary(avatarLocalPath);
+
+    const coverImage=await uploadOnCloudinary(coverImageLocalpath);
 
     if(!avatar){
-        throw new ApiError(400,"avatar file is required")
+        throw new ApiError(400,"avatar file is required sullle")
     }
+    
 
     const user=await User.create({
         fullName,
         avatar:avatar.url,
-        coverImage:coverImage?.url || "",
+        coverImage: coverImage?.url || "",
         username:username.toLowerCase(),
+        email,
+        password
     });
 
     const createduser=await User.findById(user._id).select(
@@ -63,11 +73,6 @@ const registerUser=asyncHandler(async(req,res)=>{
     return res.status(201).json(
         new ApiResponse(200,createduser,"user registered successfully")
     )
-
-
-
-
-
 })
 
 export {registerUser}
