@@ -37,7 +37,11 @@ const registerUser=asyncHandler(async(req,res)=>{
  //multer give access to files and multer give destination of file
     const avatarLocalPath = req.files?.avatar[0]?.path;
    
-    const coverImageLocalpath=req.files?.coverImage[0]?.path;
+    // const coverImageLocalpath=req.files?.coverImage[0]?.path;
+let coverImageLocalpath
+    if(req.files && Array.isArray(req.files.coverImage) && req.files.coverImage.length>0){
+        coverImageLocalpath=req.files.coverImage[0].path
+    }
   
 
     if(!avatarLocalPath){
