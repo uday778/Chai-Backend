@@ -11,16 +11,12 @@ const videoSchema = new Schema(
             required: true,
         },
         title: {
-            thumbnail: {
                 type: String,
                 required: true,
-            },
         },
         description: {
-            thumbnail: {
                 type: String,
                 required: true,
-            },
         },
         duration: {
             type: Number,
